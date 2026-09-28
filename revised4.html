@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>McArthur's Trinidad Doubles - Order System</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #eeeeee;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #111;
+}
+
+
+/* =========================
+   MAIN INTERFACE
+   ========================= */
+
+.app {
+    width: 430px;
+    max-width: calc(100% - 30px);
+    margin: 35px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+h1 {
+    text-align: center;
+    margin: 0;
+    font-size: 24px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin: 5px 0 25px;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 7px;
+    margin-top: 20px;
+    margin-bottom: 12px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    height: 42px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+.quantity-row {
+    display: grid;
+    grid-template-columns: 1fr 100px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.quantity-row label {
+    margin: 0;
+    font-size: 14px;
+}
+
+.menu-price {
+    color: #666;
+    font-weight: normal;
+    font-size: 12px;
+    margin-left: 5px;
+}
+
+button {
+    width: 100%;
+    border: none;
+    border-radius: 7px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.generate {
+    background: #111;
+    color: white;
+}
+
+.reset {
+    background: #ddd;
+    color: #111;
+}
+
+
+/* =========================
+   TICKET
+   ========================= */
+
+.ticket-area {
+    display: none;
+    margin-top: 30px;
+    text-align: center;
+}
+
+.ticket {
+    width: 80mm;
+    min-height: 160mm;
+    margin: 0 auto;
+    background: white;
+    color: black;
+    padding: 7mm 5mm;
+    text-align: left;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+.ticket-header {
+    text-align: center;
+    font-weight: bold;
+}
+
+.ticket-business {
+    font-size: 18px;
+    line-height: 1.1;
+}
+
+.ticket-subtitle {
+    font-size: 13px;
+    margin-top: 3px;
+}
+
+.ticket-order {
+    margin-top: 14px;
+    line-height: 1.5;
+}
+
+.ticket-section-title {
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.ticket-items {
+    margin-top: 8px;
+}
+
+
+/* =========================
+   INDIVIDUAL FOOD ROW
+   ========================= */
+
+.ticket-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+
+    padding: 8px 0;
+
+    font-size: 12px;
+
+    border-bottom: 1px dashed #000;
+}
+
+.ticket-item:last-child {
+    border-bottom: none;
+}
+
+.ticket-item-name {
+    flex: 1;
+    padding-right: 10px;
+    font-weight: bold;
+}
+
+.ticket-item-quantity {
+    min-width: 28px;
+    text-align: right;
+
+    font-size: 16px;
+    font-weight: bold;
+}
+
+
+/* =========================
+   SEPARATOR
+   ========================= */
+
+.separator {
+    border-top: 1px dashed #000;
+    margin: 15px 0;
+}
+
+
+/* =========================
+   PACKAGING
+   ========================= */
+
+.packaging-box {
+    border: 1px dashed #000;
+    padding: 9px 9px 6px 9px;
+    margin-bottom: 10px;
+}
+
+.packaging-box-title {
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-bottom: 9px;
+}
+
+.packaging-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 7px;
+    font-size: 12px;
+}
+
+.packaging-row span:first-child {
+    flex: 1;
+}
+
+.packaging-row strong {
+    text-align: right;
+    min-width: 25px;
+    font-size: 13px;
+}
+
+
+/* =========================
+   PRINT BUTTON
+   ========================= */
+
+.print-button {
+    background: #333;
+    color: white;
+    width: 80mm;
+    margin: 15px auto;
+    display: block;
+}
+
+
+/* =========================
+   PRINT SETTINGS
+   ========================= */
+
+@media print {
+
+    @page {
+        size: 80mm 160mm;
+        margin: 0;
+    }
+
+    html,
+    body {
+        width: 80mm;
+        margin: 0;
+        padding: 0;
+        background: white;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    .ticket-area,
+    .ticket-area * {
+        visibility: visible;
+    }
+
+    .ticket-area {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    .ticket {
+        width: 80mm;
+        min-height: 160mm;
+        margin: 0;
+        padding: 7mm 5mm;
+        box-shadow: none;
+    }
+
+    .print-button {
+        display: none !important;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- =====================================================
+     ORDER ENTRY
+     ===================================================== -->
+
+<div class="app">
+
+```
+<h1>McArthur's Trinidad Doubles</h1>
+
+<div class="subtitle">
+    Order System
+</div>
+
+
+<!-- ORDER DETAILS -->
+
+<div class="section-title">
+    Order Details
+</div>
+
+
+<label>Customer</label>
+
+<input
+    id="customer"
+    type="text"
+    placeholder="Customer name"
+>
+
+
+<label>Order Number</label>
+
+<input
+    id="orderNumber"
+    type="text"
+    placeholder="001"
+>
+
+
+<label>Collection / Delivery Time</label>
+
+<input
+    id="collectionTime"
+    type="time"
+>
+
+
+<!-- MENU -->
+
+<div class="section-title">
+    Menu
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        1 Roti
+        <span class="menu-price">£1.00</span>
+    </label>
+
+    <input
+        id="roti1"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Curries (with Rice/Roti/Fry Bake)
+        <span class="menu-price">£9.50</span>
+    </label>
+
+    <input
+        id="curries"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="section-title">
+    Doubles
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Doubles 1 PC
+        <span class="menu-price">£2.50</span>
+    </label>
+
+    <input
+        id="doubles1"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Doubles 2 PC
+        <span class="menu-price">£4.80</span>
+    </label>
+
+    <input
+        id="doubles2"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Doubles 3 PC
+        <span class="menu-price">£6.30</span>
+    </label>
+
+    <input
+        id="doubles3"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Doubles 4 PC
+        <span class="menu-price">£8.20</span>
+    </label>
+
+    <input
+        id="doubles4"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Doubles 5 PC
+        <span class="menu-price">£10.00</span>
+    </label>
+
+    <input
+        id="doubles5"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Doubles 6 PC
+        <span class="menu-price">Price TBC</span>
+    </label>
+
+    <input
+        id="doubles6"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="section-title">
+    Other Food
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Fry Bake 4 PC
+        <span class="menu-price">£2.00</span>
+    </label>
+
+    <input
+        id="fryBake"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Pholourie 5 PC
+        <span class="menu-price">£1.50</span>
+    </label>
+
+    <input
+        id="pholourie"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Pot of Dal
+        <span class="menu-price">£5.00</span>
+    </label>
+
+    <input
+        id="potDal"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Roti Chicken
+        <span class="menu-price">£5.00</span>
+    </label>
+
+    <input
+        id="rotiChicken"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Roti Lamb/Beef/Goat
+        <span class="menu-price">£6.00</span>
+    </label>
+
+    <input
+        id="rotiLambBeefGoat"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Roti Potato
+        <span class="menu-price">£5.00</span>
+    </label>
+
+    <input
+        id="rotiPotato"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Special Dal Curry Goat & White Rice
+        <span class="menu-price">£10.50</span>
+    </label>
+
+    <input
+        id="specialDalGoat"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<div class="quantity-row">
+
+    <label>
+        Vegetable Curry (with Rice/Roti/Fry Bake)
+        <span class="menu-price">£6.00</span>
+    </label>
+
+    <input
+        id="vegetableCurry"
+        type="number"
+        min="0"
+        value="0"
+    >
+
+</div>
+
+
+<button
+    class="generate"
+    onclick="generateTicket()"
+>
+    GENERATE TICKET
+</button>
+
+
+<button
+    class="reset"
+    onclick="resetOrder()"
+>
+    NEW ORDER / RESET
+</button>
+```
+
+</div>
+
+<!-- =====================================================
+     PRINTABLE TICKET
+     ===================================================== -->
+
+<div
+    class="ticket-area"
+    id="ticketArea"
+>
+
+```
+<div
+    class="ticket"
+    id="ticket"
+>
+
+
+    <!-- HEADER -->
+
+    <div class="ticket-header">
+
+        <div class="ticket-business">
+            McARTHUR'S
+        </div>
+
+        <div class="ticket-business">
+            TRINIDAD DOUBLES
+        </div>
+
+        <div class="ticket-subtitle">
+            KITCHEN ORDER
+        </div>
+
+    </div>
+
+
+    <!-- ORDER DETAILS -->
+
+    <div class="ticket-order">
+
+        <strong>
+            ORDER #
+            <span id="ticketOrder"></span>
+        </strong>
+
+        <br>
+
+        <span id="ticketCustomer"></span>
+
+        <br>
+
+        COLLECTION:
+        <span id="ticketTime"></span>
+
+    </div>
+
+
+    <!-- FOOD ORDER -->
+
+    <div class="separator"></div>
+
+    <div class="ticket-section-title">
+        ORDER
+    </div>
+
+
+    <div
+        class="ticket-items"
+        id="foodItems"
+    >
+
+        <div
+            class="ticket-item"
+            id="ticketRoti1Row"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                1 ROTI
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketRoti1"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketCurriesRow"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                CURRIES
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketCurries"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketDoubles1Row"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                DOUBLES 1 PC
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketDoubles1"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketDoubles2Row"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                DOUBLES 2 PC
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketDoubles2"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketDoubles3Row"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                DOUBLES 3 PC
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketDoubles3"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketDoubles4Row"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                DOUBLES 4 PC
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketDoubles4"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketDoubles5Row"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                DOUBLES 5 PC
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketDoubles5"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketDoubles6Row"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                DOUBLES 6 PC
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketDoubles6"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketFryBakeRow"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                FRY BAKE 4 PC
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketFryBake"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketPholourieRow"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                PHOLOURIE 5 PC
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketPholourie"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketPotDalRow"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                POT OF DAL
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketPotDal"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketRotiChickenRow"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                ROTI CHICKEN
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketRotiChicken"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketRotiLambBeefGoatRow"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                ROTI LAMB/BEEF/GOAT
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketRotiLambBeefGoat"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketRotiPotatoRow"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                ROTI POTATO
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketRotiPotato"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketSpecialDalGoatRow"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                SPECIAL DAL CURRY GOAT & RICE
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketSpecialDalGoat"
+            ></span>
+        </div>
+
+
+        <div
+            class="ticket-item"
+            id="ticketVegetableCurryRow"
+        >
+            <span
+                class="ticket-item-name"
+            >
+                VEGETABLE CURRY
+            </span>
+
+            <span
+                class="ticket-item-quantity"
+                id="ticketVegetableCurry"
+            ></span>
+        </div>
+
+    </div>
+
+
+    <!-- PACKAGING -->
+
+    <div
+        class="separator"
+        id="packagingSeparator"
+    ></div>
+
+
+    <div
+        class="ticket-section-title"
+        id="packagingTitle"
+    >
+        PACKAGING
+    </div>
+
+
+    <!-- DOUBLES -->
+
+    <div
+        class="packaging-box"
+        id="doublesPackagingBox"
+    >
+
+        <div class="packaging-box-title">
+            DOUBLES
+        </div>
+
+
+        <div class="packaging-row">
+
+            <span>Doubles bags required</span>
+
+            <strong id="bagsRequired"></strong>
+
+        </div>
+
+
+        <div
+            class="packaging-row"
+            id="sticker1Row"
+        >
+
+            <span>X1 DOUBLES stickers</span>
+
+            <strong id="sticker1"></strong>
+
+        </div>
+
+
+        <div
+            class="packaging-row"
+            id="sticker2Row"
+        >
+
+            <span>X2 DOUBLES stickers</span>
+
+            <strong id="sticker2"></strong>
+
+        </div>
+
+
+        <div
+            class="packaging-row"
+            id="sticker3Row"
+        >
+
+            <span>X3 DOUBLES stickers</span>
+
+            <strong id="sticker3"></strong>
+
+        </div>
+
+
+        <div
+            class="packaging-row"
+            id="bagLogoRow"
+        >
+
+            <span>Doubles-bag logo stickers</span>
+
+            <strong id="bagLogo"></strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- CARRIER BAGS -->
+
+    <div
+        class="packaging-box"
+        id="carrierPackagingBox"
+    >
+
+        <div class="packaging-box-title">
+            CARRIER BAGS
+        </div>
+
+
+        <div class="packaging-row">
+
+            <span>Doubles bags per carrier bag</span>
+
+            <strong>4</strong>
+
+        </div>
+
+
+        <div
+            class="packaging-row"
+            id="carrierBagsRow"
+        >
+
+            <span>Carrier bags required</span>
+
+            <strong id="carrierBags"></strong>
+
+        </div>
+
+
+        <div
+            class="packaging-row"
+            id="carrierLogoRow"
+        >
+
+            <span>Carrier-bag logo stickers</span>
+
+            <strong id="carrierLogo"></strong>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<button
+    class="print-button"
+    onclick="window.print()"
+>
+    🖨 PRINT TICKET
+</button>
+```
+
+</div>
+
+<script>
+
+
+/* =====================================================
+   HELPER FUNCTIONS
+   ===================================================== */
+
+function getQuantity(id) {
+
+    return Number(
+        document
+        .getElementById(id)
+        .value
+    ) || 0;
+
+}
+
+
+function setTicketValue(id, value) {
+
+    document
+        .getElementById(id)
+        .textContent = value;
+
+}
+
+
+function showTicketRow(rowId, quantity) {
+
+    document
+        .getElementById(rowId)
+        .style.display =
+        quantity > 0
+        ? "flex"
+        : "none";
+
+}
+
+
+/* =====================================================
+   GENERATE TICKET
+   ===================================================== */
+
+function generateTicket() {
+
+
+    /* ORDER DETAILS */
+
+    const customer =
+        document
+        .getElementById("customer")
+        .value
+        .trim();
+
+
+    const orderNumber =
+        document
+        .getElementById("orderNumber")
+        .value
+        .trim();
+
+
+    const time =
+        document
+        .getElementById("collectionTime")
+        .value;
+
+
+
+    /* MENU QUANTITIES */
+
+    const roti1 = getQuantity("roti1");
+    const curries = getQuantity("curries");
+
+    const doubles1 = getQuantity("doubles1");
+    const doubles2 = getQuantity("doubles2");
+    const doubles3 = getQuantity("doubles3");
+    const doubles4 = getQuantity("doubles4");
+    const doubles5 = getQuantity("doubles5");
+    const doubles6 = getQuantity("doubles6");
+
+    const fryBake = getQuantity("fryBake");
+    const pholourie = getQuantity("pholourie");
+    const potDal = getQuantity("potDal");
+    const rotiChicken = getQuantity("rotiChicken");
+    const rotiLambBeefGoat =
+        getQuantity("rotiLambBeefGoat");
+    const rotiPotato = getQuantity("rotiPotato");
+    const specialDalGoat =
+        getQuantity("specialDalGoat");
+    const vegetableCurry =
+        getQuantity("vegetableCurry");
+
+
+
+    /* TOTAL INDIVIDUAL DOUBLES */
+
+    const totalDoubles =
+        (doubles1 * 1) +
+        (doubles2 * 2) +
+        (doubles3 * 3) +
+        (doubles4 * 4) +
+        (doubles5 * 5) +
+        (doubles6 * 6);
+
+
+
+    /* DOUBLES BAG CALCULATION */
+
+    const bagsRequired =
+        totalDoubles === 0
+        ? 0
+        : Math.ceil(
+            totalDoubles / 3
+        );
+
+
+    let sticker1 = 0;
+    let sticker2 = 0;
+    let sticker3 = 0;
+
+
+    if (bagsRequired > 0) {
+
+        const base =
+            Math.floor(
+                totalDoubles / bagsRequired
+            );
+
+
+        const remainder =
+            totalDoubles % bagsRequired;
+
+
+        if (base === 3) {
+
+            sticker3 = bagsRequired;
+
+        }
+
+        else if (base === 2) {
+
+            sticker3 = remainder;
+
+            sticker2 =
+                bagsRequired - remainder;
+
+        }
+
+        else if (base === 1) {
+
+            sticker2 = remainder;
+
+            sticker1 =
+                bagsRequired - remainder;
+
+        }
+
+        else {
+
+            sticker1 = bagsRequired;
+
+        }
+
+    }
+
+
+
+    /* LOGO STICKERS */
+
+    const doublesBagLogoStickers =
+        bagsRequired;
+
+
+
+    /* CARRIER BAGS */
+
+    const carrierBags =
+        bagsRequired === 0
+        ? 0
+        : Math.ceil(
+            bagsRequired / 4
+        );
+
+
+    const carrierLogoStickers =
+        carrierBags;
+
+
+
+    /* ORDER DETAILS */
+
+    setTicketValue(
+        "ticketOrder",
+        orderNumber || "---"
+    );
+
+    setTicketValue(
+        "ticketCustomer",
+        customer || "CUSTOMER"
+    );
+
+    setTicketValue(
+        "ticketTime",
+        time || "---"
+    );
+
+
+
+    /* FOOD VALUES */
+
+    setTicketValue("ticketRoti1", roti1);
+    setTicketValue("ticketCurries", curries);
+
+    setTicketValue("ticketDoubles1", doubles1);
+    setTicketValue("ticketDoubles2", doubles2);
+    setTicketValue("ticketDoubles3", doubles3);
+    setTicketValue("ticketDoubles4", doubles4);
+    setTicketValue("ticketDoubles5", doubles5);
+    setTicketValue("ticketDoubles6", doubles6);
+
+    setTicketValue("ticketFryBake", fryBake);
+    setTicketValue("ticketPholourie", pholourie);
+    setTicketValue("ticketPotDal", potDal);
+    setTicketValue("ticketRotiChicken", rotiChicken);
+    setTicketValue(
+        "ticketRotiLambBeefGoat",
+        rotiLambBeefGoat
+    );
+    setTicketValue(
+        "ticketRotiPotato",
+        rotiPotato
+    );
+    setTicketValue(
+        "ticketSpecialDalGoat",
+        specialDalGoat
+    );
+    setTicketValue(
+        "ticketVegetableCurry",
+        vegetableCurry
+    );
+
+
+
+    /* SHOW / HIDE FOOD ITEMS */
+
+    showTicketRow("ticketRoti1Row", roti1);
+    showTicketRow("ticketCurriesRow", curries);
+
+    showTicketRow(
+        "ticketDoubles1Row",
+        doubles1
+    );
+
+    showTicketRow(
+        "ticketDoubles2Row",
+        doubles2
+    );
+
+    showTicketRow(
+        "ticketDoubles3Row",
+        doubles3
+    );
+
+    showTicketRow(
+        "ticketDoubles4Row",
+        doubles4
+    );
+
+    showTicketRow(
+        "ticketDoubles5Row",
+        doubles5
+    );
+
+    showTicketRow(
+        "ticketDoubles6Row",
+        doubles6
+    );
+
+    showTicketRow(
+        "ticketFryBakeRow",
+        fryBake
+    );
+
+    showTicketRow(
+        "ticketPholourieRow",
+        pholourie
+    );
+
+    showTicketRow(
+        "ticketPotDalRow",
+        potDal
+    );
+
+    showTicketRow(
+        "ticketRotiChickenRow",
+        rotiChicken
+    );
+
+    showTicketRow(
+        "ticketRotiLambBeefGoatRow",
+        rotiLambBeefGoat
+    );
+
+    showTicketRow(
+        "ticketRotiPotatoRow",
+        rotiPotato
+    );
+
+    showTicketRow(
+        "ticketSpecialDalGoatRow",
+        specialDalGoat
+    );
+
+    showTicketRow(
+        "ticketVegetableCurryRow",
+        vegetableCurry
+    );
+
+
+
+    /* PACKAGING */
+
+    setTicketValue(
+        "bagsRequired",
+        bagsRequired
+    );
+
+    setTicketValue(
+        "sticker1",
+        sticker1
+    );
+
+    setTicketValue(
+        "sticker2",
+        sticker2
+    );
+
+    setTicketValue(
+        "sticker3",
+        sticker3
+    );
+
+    setTicketValue(
+        "bagLogo",
+        doublesBagLogoStickers
+    );
+
+    setTicketValue(
+        "carrierBags",
+        carrierBags
+    );
+
+    setTicketValue(
+        "carrierLogo",
+        carrierLogoStickers
+    );
+
+
+
+    /* HIDE ZERO STICKER ROWS */
+
+    showTicketRow(
+        "sticker1Row",
+        sticker1
+    );
+
+    showTicketRow(
+        "sticker2Row",
+        sticker2
+    );
+
+    showTicketRow(
+        "sticker3Row",
+        sticker3
+    );
+
+    showTicketRow(
+        "bagLogoRow",
+        doublesBagLogoStickers
+    );
+
+
+
+    /* PACKAGING VISIBILITY */
+
+    document
+        .getElementById("doublesPackagingBox")
+        .style.display =
+        totalDoubles > 0
+        ? "block"
+        : "none";
+
+
+    document
+        .getElementById("carrierPackagingBox")
+        .style.display =
+        totalDoubles > 0
+        ? "block"
+        : "none";
+
+
+    document
+        .getElementById("packagingSeparator")
+        .style.display =
+        totalDoubles > 0
+        ? "block"
+        : "none";
+
+
+    document
+        .getElementById("packagingTitle")
+        .style.display =
+        totalDoubles > 0
+        ? "block"
+        : "none";
+
+
+
+    /* SHOW TICKET */
+
+    document
+        .getElementById("ticketArea")
+        .style.display =
+        "block";
+
+
+    document
+        .getElementById("ticketArea")
+        .scrollIntoView({
+            behavior: "smooth"
+        });
+
+}
+
+
+
+/* =====================================================
+   RESET
+   ===================================================== */
+
+function resetOrder() {
+
+    const fields = [
+
+        "customer",
+        "orderNumber",
+        "collectionTime",
+
+        "roti1",
+        "curries",
+
+        "doubles1",
+        "doubles2",
+        "doubles3",
+        "doubles4",
+        "doubles5",
+        "doubles6",
+
+        "fryBake",
+        "pholourie",
+        "potDal",
+        "rotiChicken",
+        "rotiLambBeefGoat",
+        "rotiPotato",
+        "specialDalGoat",
+        "vegetableCurry"
+
+    ];
+
+
+    fields.forEach(function(id) {
+
+        document
+            .getElementById(id)
+            .value = "";
+
+    });
+
+
+    document
+        .getElementById("ticketArea")
+        .style.display =
+        "none";
+
+}
+
+</script>
+
+</body>
+</html>
